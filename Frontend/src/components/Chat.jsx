@@ -14,7 +14,7 @@ const Chat = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, selectedContact]);
 
     const handleSendMessage = () => {
         if (selectedContact && message.trim()) {
@@ -24,6 +24,8 @@ const Chat = () => {
             toast.error("Please select a contact and enter a message.");
         }
     };
+
+    const filteredMessages = messages[selectedContact] || [];
 
     return (
         <div className="flex flex-col h-screen">
@@ -50,7 +52,7 @@ const Chat = () => {
                     <div className="flex-1 overflow-auto mb-4">
                         <h2 className="text-lg font-bold text-light mb-2">Messages</h2>
                         <ul className="space-y-2 flex flex-col">
-                            {messages.map((msg, index) => (
+                            {filteredMessages.map((msg, index) => (
                                 <li key={index} className={`message ${msg.sender === username ? 'right' : 'left'}`}>
                                     <strong>{msg.sender === username ? "You" : msg.sender}: </strong>{msg.message}
                                 </li>

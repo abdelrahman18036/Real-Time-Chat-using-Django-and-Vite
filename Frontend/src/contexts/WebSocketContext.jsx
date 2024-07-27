@@ -6,7 +6,7 @@ const WebSocketContext = createContext(null);
 export const useWebSocket = () => useContext(WebSocketContext);
 
 export const WebSocketProvider = ({ children }) => {
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState({});
     const [contacts, setContacts] = useState([]);
     const [username, setUsername] = useState("");  // Track the current user's username
     const socket = useRef(null);
@@ -63,7 +63,12 @@ export const WebSocketProvider = ({ children }) => {
             socket.current.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 console.log("Received WebSocket message:", data);
-                setMessages(prev => [...prev, data]);
+                const { sender, message, recipient } = data;
+                const otherParty = sender === username ? recipient : sender;
+                setMessages(prev => ({
+                    ...prev,
+                    [otherParty]: [...(prev[otherParty] || []), data]
+                }));
             };
 
             socket.current.onclose = e => {
@@ -88,7 +93,12 @@ export const WebSocketProvider = ({ children }) => {
     const sendMessage = (message, contact) => {
         if (socket.current && socket.current.readyState === WebSocket.OPEN) {
             console.log("Sending message:", message);
-            socket.current.send(JSON.stringify({ message, contact }));
+            const data = { message, contact, sender: username, recipient: contact };
+            socket.current.send(JSON.stringify(data));
+            setMessages(prev => ({
+                ...prev,
+                [contact]: [...(prev[contact] || []), data]
+            }));
         }
     };
 
