@@ -6,6 +6,24 @@ body {
   @apply bg-dark-bg text-text-light;
 }
 
+.message {
+  padding: 10px;
+  border-radius: 5px;
+  margin: 5px 0;
+  max-width: 60%;
+}
+
+.message.left {
+  background-color: #000000;
+  align-self: flex-start;
+}
+
+.message.right {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+}
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

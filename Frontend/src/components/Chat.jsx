@@ -49,9 +49,9 @@ const Chat = () => {
                 <main className="flex-1 flex flex-col p-4 bg-dark-bg">
                     <div className="flex-1 overflow-auto mb-4">
                         <h2 className="text-lg font-bold text-light mb-2">Messages</h2>
-                        <ul className="space-y-2">
+                        <ul className="space-y-2 flex flex-col">
                             {messages.map((msg, index) => (
-                                <li key={index} className="bg-purple text-light p-2 rounded">
+                                <li key={index} className={`message ${msg.sender === username ? 'right' : 'left'}`}>
                                     <strong>{msg.sender === username ? "You" : msg.sender}: </strong>{msg.message}
                                 </li>
                             ))}
