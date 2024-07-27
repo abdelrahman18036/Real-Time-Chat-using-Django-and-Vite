@@ -3,7 +3,7 @@ import { useWebSocket } from "../contexts/WebSocketContext";
 import { toast } from 'react-toastify';
 
 const Chat = () => {
-    const { messages, sendMessage, contacts, username } = useWebSocket();
+    const { messages, sendMessage, contacts, username, unreadCounts, setUnreadCounts } = useWebSocket();
     const [selectedContact, setSelectedContact] = useState("");
     const [message, setMessage] = useState("");
     const messagesEndRef = useRef(null);
@@ -14,6 +14,12 @@ const Chat = () => {
 
     useEffect(() => {
         scrollToBottom();
+        if (selectedContact) {
+            setUnreadCounts(prev => ({
+                ...prev,
+                [selectedContact]: 0
+            }));
+        }
     }, [messages, selectedContact]);
 
     const handleSendMessage = () => {
@@ -22,6 +28,12 @@ const Chat = () => {
             setMessage("");
         } else {
             toast.error("Please select a contact and enter a message.");
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            handleSendMessage();
         }
     };
 
@@ -39,10 +51,21 @@ const Chat = () => {
                         {contacts.filter(c => c.accepted).map(contact => (
                             <li
                                 key={contact.id}
-                                onClick={() => setSelectedContact(contact.other_party.username)}
+                                onClick={() => {
+                                    setSelectedContact(contact.other_party.username);
+                                    setUnreadCounts(prev => ({
+                                        ...prev,
+                                        [contact.other_party.username]: 0
+                                    }));
+                                }}
                                 className={`p-2 rounded cursor-pointer ${selectedContact === contact.other_party.username ? 'bg-purple' : 'bg-dark-bg'} text-light`}
                             >
                                 {contact.other_party.username}
+                                {unreadCounts[contact.other_party.username] > 0 && (
+                                    <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                                        {unreadCounts[contact.other_party.username]}
+                                    </span>
+                                )}
                             </li>
                         ))}
                     </ul>
@@ -66,6 +89,7 @@ const Chat = () => {
                             value={message}
                             onChange={e => setMessage(e.target.value)}
                             placeholder="Type a message..."
+                            onKeyPress={handleKeyPress}
                             className="flex-1 p-2 rounded-l-md border-gray-300 bg-dark-bg text-light"
                             autoFocus
                         />

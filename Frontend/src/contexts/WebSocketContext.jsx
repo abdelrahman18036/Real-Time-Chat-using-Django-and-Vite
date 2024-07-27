@@ -8,7 +8,9 @@ export const useWebSocket = () => useContext(WebSocketContext);
 export const WebSocketProvider = ({ children }) => {
     const [messages, setMessages] = useState({});
     const [contacts, setContacts] = useState([]);
-    const [username, setUsername] = useState("");  // Track the current user's username
+    const [pendingContacts, setPendingContacts] = useState([]);
+    const [unreadCounts, setUnreadCounts] = useState({});
+    const [username, setUsername] = useState("");
     const socket = useRef(null);
     const reconnectInterval = useRef(null);
 
@@ -16,9 +18,10 @@ export const WebSocketProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         if (token) {
             axios.defaults.headers.common['Authorization'] = `Token ${token}`;
-            fetchUserData(token);  // Fetch user data to get the username
+            fetchUserData(token);
             connectWebSocket(token);
             fetchContacts();
+            fetchPendingContacts();
         }
 
         return () => {
@@ -62,13 +65,18 @@ export const WebSocketProvider = ({ children }) => {
 
             socket.current.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                console.log("Received WebSocket message:", data);
                 const { sender, message, recipient } = data;
                 const otherParty = sender === username ? recipient : sender;
                 setMessages(prev => ({
                     ...prev,
                     [otherParty]: [...(prev[otherParty] || []), data]
                 }));
+                if (sender !== username) {
+                    setUnreadCounts(prev => ({
+                        ...prev,
+                        [otherParty]: (prev[otherParty] || 0) + 1
+                    }));
+                }
             };
 
             socket.current.onclose = e => {
@@ -92,7 +100,6 @@ export const WebSocketProvider = ({ children }) => {
 
     const sendMessage = (message, contact) => {
         if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-            console.log("Sending message:", message);
             const data = { message, contact, sender: username, recipient: contact };
             socket.current.send(JSON.stringify(data));
             setMessages(prev => ({
@@ -111,6 +118,7 @@ export const WebSocketProvider = ({ children }) => {
             fetchUserData(token);
             connectWebSocket(token);
             fetchContacts();
+            fetchPendingContacts();
         } catch (error) {
             console.error("Login error:", error);
         }
@@ -125,6 +133,7 @@ export const WebSocketProvider = ({ children }) => {
             fetchUserData(token);
             connectWebSocket(token);
             fetchContacts();
+            fetchPendingContacts();
         } catch (error) {
             console.error("Registration error:", error.response.data);
         }
@@ -139,10 +148,19 @@ export const WebSocketProvider = ({ children }) => {
         }
     };
 
+    const fetchPendingContacts = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/contacts/pending_requests/");
+            setPendingContacts(response.data);
+        } catch (error) {
+            console.error("Error fetching pending contacts:", error);
+        }
+    };
+
     const sendContactRequest = async (username) => {
         try {
             const response = await axios.post("http://localhost:8000/contacts/send_request/", { username });
-            console.log(response.data);
+            fetchPendingContacts();
             fetchContacts();
         } catch (error) {
             console.error("Error sending contact request:", error);
@@ -152,7 +170,7 @@ export const WebSocketProvider = ({ children }) => {
     const acceptContactRequest = async (username) => {
         try {
             const response = await axios.post("http://localhost:8000/contacts/accept_request/", { username });
-            console.log(response.data);
+            fetchPendingContacts();
             fetchContacts();
         } catch (error) {
             console.error("Error accepting contact request:", error);
@@ -162,7 +180,7 @@ export const WebSocketProvider = ({ children }) => {
     const removeContact = async (username) => {
         try {
             const response = await axios.post("http://localhost:8000/contacts/remove_contact/", { username });
-            console.log(response.data);
+            fetchPendingContacts();
             fetchContacts();
         } catch (error) {
             console.error("Error removing contact:", error);
@@ -176,10 +194,13 @@ export const WebSocketProvider = ({ children }) => {
             login,
             register,
             contacts,
+            pendingContacts,
             sendContactRequest,
             acceptContactRequest,
             removeContact,
-            username
+            username,
+            unreadCounts,
+            setUnreadCounts
         }}>
             {children}
         </WebSocketContext.Provider>

@@ -26,25 +26,27 @@ class ContactViewSet(viewsets.ModelViewSet):
         context.update({"request": self.request})
         return context
 
-
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def pending_requests(self, request):
+        user = request.user
+        pending_requests = Contact.objects.filter(contact=user, accepted=False)
+        serializer = self.get_serializer(pending_requests, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
-    # Automatically set the requesting user as the user when creating a new contact
         user = self.request.user
         contact_user = serializer.validated_data['contact']
-        
-        # Check if the contact already exists in either direction
+
         existing_contact = Contact.objects.filter(
             Q(user=user, contact=contact_user) | Q(user=contact_user, contact=user)
         ).first()
-        
+
         if existing_contact:
-            # If the contact exists in either direction and is not accepted, accept it
-            existing_contact.accepted = True
-            existing_contact.save(update_fields=['accepted'])
+            if not existing_contact.accepted:
+                existing_contact.accepted = True
+                existing_contact.save(update_fields=['accepted'])
         else:
-            # Otherwise, create a new contact
-            serializer.save(user=user, accepted=True)  # Set accepted=True directly if creating upon acceptance
+            serializer.save(user=user)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def send_request(self, request):
@@ -55,11 +57,11 @@ class ContactViewSet(viewsets.ModelViewSet):
             existing_contact = Contact.objects.filter(
                 Q(user=user, contact=contact_user) | Q(user=contact_user, contact=user)
             ).first()
-            
+
             if existing_contact:
                 return Response({'error': 'Contact request already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            Contact.objects.create(user=user, contact=contact_user)  # Assume not accepted until accepted by the other party
+
+            Contact.objects.create(user=user, contact=contact_user)
             return Response({'status': 'Contact request sent.'})
         except User.DoesNotExist:
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
@@ -70,9 +72,7 @@ class ContactViewSet(viewsets.ModelViewSet):
         contact_username = request.data.get('username')
         try:
             contact_user = User.objects.get(username=contact_username)
-            contact_request = Contact.objects.get(
-                Q(user=contact_user, contact=user) | Q(user=user, contact=contact_user)
-            )
+            contact_request = Contact.objects.get(user=contact_user, contact=user)
             contact_request.accepted = True
             contact_request.save()
             return Response({'status': 'Contact request accepted.'})
@@ -91,9 +91,6 @@ class ContactViewSet(viewsets.ModelViewSet):
             return Response({'status': 'Contact removed.'})
         except User.DoesNotExist:
             return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)

@@ -5,7 +5,7 @@ from .models import Contact
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')  # Removed 'password' from fields to improve security
+        fields = ('id', 'username', 'email')
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
     def create(self, validated_data):
@@ -20,7 +20,6 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = ('id', 'other_party', 'accepted')
 
     def get_other_party(self, obj):
-        # Retrieve the request user from the serializer context
         request_user = self.context['request'].user
         other_party = obj.get_other_party(request_user)
         return UserSerializer(other_party).data

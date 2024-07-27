@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
 import { toast } from 'react-toastify';
 
 const ContactManagement = () => {
     const [username, setUsername] = useState("");
-    const { sendContactRequest, acceptContactRequest, removeContact, contacts } = useWebSocket();
+    const { sendContactRequest, acceptContactRequest, removeContact, contacts, pendingContacts } = useWebSocket();
+
+    useEffect(() => {
+        console.log("Contacts: ", contacts);
+        console.log("Pending Contacts: ", pendingContacts);
+    }, [contacts, pendingContacts]);
 
     const handleSendContactRequest = () => {
         if (!username.trim()) {
@@ -36,11 +41,11 @@ const ContactManagement = () => {
             <div>
                 <h3 className="text-lg font-bold text-text-light mb-2">Pending Requests</h3>
                 <ul className="space-y-2">
-                    {contacts.filter(c => !c.accepted).map(contact => (
-                        <li key={contact.id} className="bg-dark-purple text-text-light p-2 rounded">
-                            {contact.contact.username}
+                    {pendingContacts.filter(c => c.accepted === false).map(contact => (
+                        <li key={`pending-${contact.id}`} className="bg-dark-purple text-text-light p-2 rounded">
+                            {contact.other_party.username}
                             <button
-                                onClick={() => acceptContactRequest(contact.contact.username)}
+                                onClick={() => acceptContactRequest(contact.other_party.username)}
                                 className="bg-purple text-text-light px-4 py-2 rounded shadow hover:bg-dark-purple ml-2"
                             >
                                 Accept
@@ -53,10 +58,10 @@ const ContactManagement = () => {
                 <h3 className="text-lg font-bold text-text-light mb-2">Contacts</h3>
                 <ul className="space-y-2">
                     {contacts.filter(c => c.accepted).map(contact => (
-                        <li key={contact.id} className="bg-dark-purple text-text-light p-2 rounded">
-                            {contact.contact.username}
+                        <li key={`contact-${contact.id}`} className="bg-dark-purple text-text-light p-2 rounded">
+                            {contact.other_party.username}
                             <button
-                                onClick={() => removeContact(contact.contact.username)}
+                                onClick={() => removeContact(contact.other_party.username)}
                                 className="bg-red-500 text-text-light px-4 py-2 rounded shadow hover:bg-red-700 ml-2"
                             >
                                 Remove
