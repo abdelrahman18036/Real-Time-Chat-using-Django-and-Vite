@@ -9,6 +9,8 @@ module.exports = {
         purple: "#6d28d9",
         "dark-bg": "#1a202c",
         "text-light": "#e2e8f0",
+        "light-bg": "#ffffff", // Light mode background color
+        "light-text": "#000000", // Light mode text color
       },
     },
   },

@@ -2,15 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-dark-bg text-text-light;
+/* styles.css */
+:root {
+  --bg-color: white;
+  --text-color: black;
 }
 
-.message {
-  padding: 10px;
-  border-radius: 5px;
-  margin: 5px 0;
-  max-width: 60%;
+.dark {
+  --bg-color: #1a202c;
+  --text-color: #e2e8f0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 .message.left {
