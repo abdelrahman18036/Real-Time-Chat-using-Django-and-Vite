@@ -8,7 +8,14 @@ from .serializers import ContactSerializer, UserSerializer
 from rest_framework.decorators import action
 from django.db.models import Q
 from .models import Contact
+from rest_framework.views import APIView
 
+
+class CheckLoginStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return Response({"logged_in": True})
 class ContactViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer

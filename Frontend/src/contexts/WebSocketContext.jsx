@@ -1,4 +1,3 @@
-// WebSocketContext.jsx
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 
@@ -228,6 +227,22 @@ export const WebSocketProvider = ({ children }) => {
         }
     };
 
+    const logout = () => {
+        localStorage.removeItem('token');
+        axios.defaults.headers.common['Authorization'] = '';
+        setUsername('');
+        setMessages({});
+        setContacts([]);
+        setUnreadCounts({});
+        setOnlineStatus({});
+        if (socket.current) {
+            socket.current.close();
+        }
+        if (onlineSocket.current) {
+            onlineSocket.current.close();
+        }
+    };
+
     return (
         <WebSocketContext.Provider value={{
             messages,
@@ -242,9 +257,12 @@ export const WebSocketProvider = ({ children }) => {
             unreadCounts,
             setUnreadCounts,
             onlineStatus,
-            setOnlineStatus // Ensure this is included
+            setOnlineStatus,
+            logout
         }}>
             {children}
         </WebSocketContext.Provider>
     );
 };
+
+export default WebSocketProvider;

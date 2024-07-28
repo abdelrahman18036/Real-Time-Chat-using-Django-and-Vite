@@ -6,15 +6,42 @@ html {
   scroll-behavior: smooth;
 }
 
+.h-screen {
+  height: 100vh;
+}
+
+/* Add smooth transition for background and text colors */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.bg-white,
+.bg-gray-800,
+.text-black,
+.text-white,
+.bg-gray-200,
+.dark:bg-gray-700,
+.dark:bg-dark-bg,
+.dark:text-text-light,
+.dark:text-white {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* styles.css */
 :root {
   --bg-color: #f5f5f7;
   --text-color: black;
+  --send-bg: #0b93f6;
+  --send-color: white;
+  --receive-bg: #e5e5ea;
+  --receive-text: black;
+  --page-background: white;
 }
 
 .dark {
   --bg-color: #1a202c;
   --text-color: #e2e8f0;
+  --page-background: #1f2937;
 }
 
 .light {
@@ -32,17 +59,106 @@ header {
   color: var(--text-color);
 }
 
+.p {
+  max-width: 255px;
+  word-wrap: break-word;
+  margin-bottom: 12px;
+  line-height: 24px;
+  position: relative;
+  padding: 10px 20px;
+  border-radius: 25px;
+}
 
-.message.left {
-  background-color: #000000;
+.p:before,
+.p:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  height: 25px;
+}
+
+.send {
+  color: var(--send-color);
+  background: var(--send-bg);
+  align-self: flex-end;
+}
+
+.send:before {
+  right: -7px;
+  width: 20px;
+  background-color: var(--send-bg);
+  border-bottom-left-radius: 16px 14px;
+}
+
+.send:after {
+  right: -26px;
+  width: 26px;
+  background-color: var(--page-background);
+  border-bottom-left-radius: 10px;
+}
+
+.receive {
+  background: var(--receive-bg);
+  color: black;
   align-self: flex-start;
 }
 
-.message.right {
-  background-color: #007bff;
-  color: white;
-  align-self: flex-end;
+.receive:before {
+  left: -7px;
+  width: 20px;
+  background-color: var(--receive-bg);
+  border-bottom-right-radius: 16px 14px;
 }
+
+.receive:after {
+  left: -26px;
+  width: 26px;
+  background-color: var(--page-background);
+  border-bottom-right-radius: 10px;
+}
+
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: -150px;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(to right, transparent 0%, #f0f0f0 50%, transparent 100%);
+  animation: skeleton-loading 1.2s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    left: -150px;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.skeleton-text {
+  height: 16px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.skeleton-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+}
+
 
 
 /* @keyframes fadeIn {

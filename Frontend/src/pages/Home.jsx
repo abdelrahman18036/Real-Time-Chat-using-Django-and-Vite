@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 import { toast } from 'react-toastify';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Chatimage from "../assets/images/chatti-sample.png";
 import LoginModal from "../components/modals/LoginModal";
 import RegisterModal from "../components/modals/RegisterModal";
@@ -18,15 +18,21 @@ const Home = () => {
         setIsRegisterModalOpen(true);
     };
 
+    const modalVariants = {
+        hidden: { opacity: 0, y: -50 },
+        visible: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 50 }
+    };
+
     return (
-        <div className="mx-auto mt-20 mb-10 flex h-full w-[90%] flex-col items-center justify-center rounded-[3rem] bg-white dark:bg-gray-800 px-6 pt-16 pb-7 md:px-16 md:pt-24  md:pb-16 lg:w-[80%] lg:px-20 2xl:px-0 overflow-y-auto" style={{ scrollBehavior: 'smooth' }}>
+        <div className="mx-auto mt-20 mb-10 flex h-full w-[90%] flex-col items-center justify-center rounded-[3rem] bg-white dark:bg-gray-800 px-6 pt-16 pb-7 md:px-16 md:pt-24 md:pb-16 lg:w-[80%] lg:px-20 2xl:px-0 overflow-y-auto" style={{ scrollBehavior: 'smooth' }}>
             <motion.h1
-                className="mb-2 text-center text-3xl md:text-4xl lg:text-5xl font-medium text-black dark:text-white"
+                className="mb-2 text-center text-4xl md:text-4xl lg:text-7xl font-medium text-black dark:text-white"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                H-Chat
+                XOV
             </motion.h1>
             <motion.div
                 className="mx-auto w-full sm:w-[80%] md:w-full 2xl:w-[70%]"
@@ -36,8 +42,7 @@ const Home = () => {
             >
                 <p className="mb-5 text-center text-sm md:text-base lg:text-lg font-medium text-black dark:text-white">
                     Getting in touch is more essential than ever. Chat with strangers
-                    and people from all over the world. Choose to hide your name and
-                    photo and chat with anonymity!
+                    and people from all over the world.
                 </p>
                 <div className="flex justify-center space-x-4">
                     <button
@@ -68,12 +73,38 @@ const Home = () => {
                     className="rounded-md md:rounded-lg lg:rounded-xl shadow-lg"
                 />
             </motion.div>
-            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-            <RegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} onRegisterSuccess={() => {
-                setIsRegisterModalOpen(false);
-                setIsLoginModalOpen(true);
-                toast.success("Registration successful! Please log in.");
-            }} />
+            <AnimatePresence>
+                {isLoginModalOpen && (
+                    <motion.div
+                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={modalVariants}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <AnimatePresence>
+                {isRegisterModalOpen && (
+                    <motion.div
+                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={modalVariants}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <RegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} onRegisterSuccess={() => {
+                            setIsRegisterModalOpen(false);
+                            setIsLoginModalOpen(true);
+                            toast.success("Registration successful! Please log in.");
+                        }} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

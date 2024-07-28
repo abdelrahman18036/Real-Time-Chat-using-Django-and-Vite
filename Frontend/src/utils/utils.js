@@ -1,24 +1,16 @@
-// utils/utils.js
-export const formatLastSeen = (isoString) => {
-  const timeDiff = Math.floor(
-    (Date.now() - new Date(isoString).getTime()) / 1000
-  );
-  const seconds = timeDiff % 60;
-  const minutes = Math.floor(timeDiff / 60) % 60;
-  const hours = Math.floor(timeDiff / 3600) % 24;
-  const days = Math.floor(timeDiff / 86400);
+export const formatLastSeen = (lastSeen) => {
+  if (!lastSeen) return "a while ago";
+  const now = new Date();
+  const diff = now - new Date(lastSeen);
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
-  if (timeDiff < 60) {
-    return "just now";
-  }
-  if (days > 0) {
-    return `${days}d ${hours}h ${minutes}m ago`;
-  }
-  if (hours > 0) {
-    return `${hours}h ${minutes}m ago`;
-  }
-  if (minutes > 0) {
-    return `${minutes}m ago`;
-  }
-  return `${seconds}s ago`;
+  if (minutes < 1) return "just now";
+  if (minutes === 1) return "a minute ago";
+  if (minutes < 60) return `${minutes} minutes ago`;
+  if (hours === 1) return "an hour ago";
+  if (hours < 24) return `${hours} hours ago`;
+  if (days === 1) return "a day ago";
+  return `${days} days ago`;
 };
