@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+
 import ContactManagement from "./pages/ContactManagement";
 import Header from "./components/Header";
 import { useTheme } from './contexts/ThemeContext';
@@ -19,8 +18,6 @@ const App = () => {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/contacts" element={<ContactManagement />} />
             <Route path="*" element={<NotFound />} />
