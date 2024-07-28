@@ -1,3 +1,4 @@
+// WebSocketContext.jsx
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 
@@ -75,8 +76,8 @@ export const WebSocketProvider = ({ children }) => {
             const data = JSON.parse(event.data);
             console.log("Received WebSocket message:", data);
             if (data.type === 'chat_message') {
-                const { sender, message } = data;
-                const otherParty = sender === username ? data.recipient : sender;
+                const { sender, message, recipient } = data;
+                const otherParty = sender === username ? recipient : sender;
                 setMessages(prev => ({
                     ...prev,
                     [otherParty]: [...(prev[otherParty] || []), data]
@@ -240,7 +241,8 @@ export const WebSocketProvider = ({ children }) => {
             username,
             unreadCounts,
             setUnreadCounts,
-            onlineStatus
+            onlineStatus,
+            setOnlineStatus // Ensure this is included
         }}>
             {children}
         </WebSocketContext.Provider>

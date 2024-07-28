@@ -1,3 +1,4 @@
+// Chat.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
 import { toast } from 'react-toastify';
@@ -5,7 +6,7 @@ import { FaCircle } from 'react-icons/fa';
 import { formatLastSeen } from "../utils/utils";
 
 const Chat = () => {
-    const { messages, sendMessage, contacts, username, unreadCounts, setUnreadCounts, onlineStatus } = useWebSocket();
+    const { messages, sendMessage, contacts, username, unreadCounts, setUnreadCounts, onlineStatus, setOnlineStatus } = useWebSocket();
     const [selectedContact, setSelectedContact] = useState("");
     const [message, setMessage] = useState("");
     const messagesEndRef = useRef(null);
@@ -23,6 +24,27 @@ const Chat = () => {
             }));
         }
     }, [messages, selectedContact]);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            incrementLastSeenTimes();
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, [onlineStatus]);
+
+    const incrementLastSeenTimes = () => {
+        setOnlineStatus(prevStatus => {
+            const updatedStatus = { ...prevStatus };
+            Object.keys(updatedStatus).forEach(user => {
+                if (!updatedStatus[user].is_online) {
+                    const lastSeen = new Date(updatedStatus[user].last_seen);
+                    updatedStatus[user].last_seen = new Date(lastSeen.getTime() - 100).toISOString();
+                }
+            });
+            return updatedStatus;
+        });
+    };
 
     const handleSendMessage = () => {
         if (selectedContact && message.trim()) {
