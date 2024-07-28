@@ -15,3 +15,10 @@ class Contact(models.Model):
     def get_other_party(self, current_user):
         return self.contact if self.user == current_user else self.user
 
+
+class OnlineStatus(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='onlinestatus')
+    is_online = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} is {'online' if self.is_online else 'offline'}"

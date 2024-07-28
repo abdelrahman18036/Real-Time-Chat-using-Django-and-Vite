@@ -1,12 +1,17 @@
+# serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Contact
+from .models import Contact, OnlineStatus
 
 class UserSerializer(serializers.ModelSerializer):
+    is_online = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
-        extra_kwargs = {'password': {'write_only': True, 'required': True}}
+        fields = ('id', 'username', 'email', 'is_online')
+
+    def get_is_online(self, obj):
+        return obj.onlinestatus.is_online
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)

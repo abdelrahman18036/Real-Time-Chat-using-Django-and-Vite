@@ -1,9 +1,11 @@
+// Chat.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
+import { FaCircle } from "react-icons/fa";
 import { toast } from 'react-toastify';
 
 const Chat = () => {
-    const { messages, sendMessage, contacts, username, unreadCounts, setUnreadCounts } = useWebSocket();
+    const { messages, sendMessage, contacts, username, unreadCounts, setUnreadCounts, onlineStatus } = useWebSocket();
     const [selectedContact, setSelectedContact] = useState("");
     const [message, setMessage] = useState("");
     const messagesEndRef = useRef(null);
@@ -66,6 +68,7 @@ const Chat = () => {
                                         {unreadCounts[contact.other_party.username]}
                                     </span>
                                 )}
+                                <FaCircle color={onlineStatus[contact.other_party.username] ? "green" : "gray"} className="ml-2" />
                             </li>
                         ))}
                     </ul>

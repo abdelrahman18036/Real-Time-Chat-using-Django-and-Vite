@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import Contact
+from .models import Contact, OnlineStatus
 
 admin.site.register(Contact)
-
-
-
-# Register your models here.
+admin.site.register(OnlineStatus)
