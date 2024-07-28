@@ -13,10 +13,21 @@
   --text-color: #e2e8f0;
 }
 
+.light {
+  --bg-color: #ffffff;
+  --text-color: #1a202c;
+}
+
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
 }
+
+header {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
 
 .message.left {
   background-color: #000000;

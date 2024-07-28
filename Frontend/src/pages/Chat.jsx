@@ -4,7 +4,7 @@ import { useWebSocket } from "../contexts/WebSocketContext";
 import { toast } from 'react-toastify';
 import { FaCircle } from 'react-icons/fa';
 import { formatLastSeen } from "../utils/utils";
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "../components/ThemeToggle";
 import { useTheme } from "../contexts/ThemeContext";
 
 const Chat = () => {
@@ -73,12 +73,7 @@ const Chat = () => {
 
     return (
         <div className={`flex flex-col h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
-            <header className={`p-4 shadow-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-200"}`}>
-                <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-bold">Chat Application</h1>
-                    <ThemeToggle />
-                </div>
-            </header>
+
             <div className="flex flex-1 overflow-hidden">
                 <aside className={`w-1/4 p-4 overflow-y-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-200"}`}>
                     <h2 className="text-lg font-bold mb-4">Contacts</h2>
