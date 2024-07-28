@@ -75,8 +75,8 @@ export const WebSocketProvider = ({ children }) => {
             const data = JSON.parse(event.data);
             console.log("Received WebSocket message:", data);
             if (data.type === 'chat_message') {
-                const { sender, message, recipient } = data;
-                const otherParty = sender === username ? recipient : sender;
+                const { sender, message } = data;
+                const otherParty = sender === username ? data.recipient : sender;
                 setMessages(prev => ({
                     ...prev,
                     [otherParty]: [...(prev[otherParty] || []), data]

@@ -1,8 +1,8 @@
-// ContactManagement.jsx
 import React, { useState } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
 import { toast } from 'react-toastify';
-import { FaCircle } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaCircle } from 'react-icons/fa';
+import { formatLastSeen } from "../utils/utils";
 
 const ContactManagement = () => {
     const [username, setUsername] = useState("");
@@ -18,54 +18,67 @@ const ContactManagement = () => {
     };
 
     return (
-        <div className="m-3 space-y-4 max-w-md mx-auto">
-            <h2 className="text-3xl font-bold mb-4">Manage Contacts</h2>
-            <div>
-                <label className="block text-sm font-medium text-text-light">Add Contact</label>
+        <div className="m-6 p-6 bg-gray-800 rounded-lg text-white shadow-md">
+            <h2 className="text-3xl font-bold mb-6">Manage Contacts</h2>
+            <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">Add Contact</label>
                 <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 bg-dark-bg text-text-light shadow-sm"
+                    className="w-full p-2 mb-2 rounded bg-gray-900 border border-gray-700 focus:outline-none"
                 />
                 <button
                     onClick={handleSendContactRequest}
-                    className="bg-purple text-text-light px-4 py-2 rounded shadow hover:bg-dark-purple mt-2"
+                    className="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded"
                 >
                     Send Contact Request
                 </button>
             </div>
-            <div>
-                <h3 className="text-lg font-bold text-text-light mb-2">Pending Requests</h3>
-                <ul className="space-y-2">
-                    {contacts.filter(c => !c.accepted && c.user !== username).map(contact => (
-                        <li key={contact.id} className="bg-dark-purple text-text-light p-2 rounded flex justify-between items-center">
-                            {contact.other_party.username}
-                            <button
-                                onClick={() => acceptContactRequest(contact.other_party.username)}
-                                className="bg-purple text-text-light px-4 py-2 rounded shadow hover:bg-dark-purple ml-2"
-                            >
-                                Accept
-                            </button>
+            <div className="mb-6">
+                <h3 className="text-lg font-bold mb-4">Pending Requests</h3>
+                <ul className="space-y-4">
+                    {contacts.filter(c => !c.accepted).map(contact => (
+                        <li key={contact.id} className="p-4 bg-gray-700 rounded flex justify-between items-center">
+                            <span>{contact.other_party.username}</span>
+                            <div className="flex items-center">
+                                <button
+                                    onClick={() => acceptContactRequest(contact.other_party.username)}
+                                    className="p-2 bg-green-500 hover:bg-green-600 rounded-full text-white"
+                                >
+                                    <FaCheck />
+                                </button>
+                                <button
+                                    onClick={() => removeContact(contact.other_party.username)}
+                                    className="p-2 ml-2 bg-red-500 hover:bg-red-600 rounded-full text-white"
+                                >
+                                    <FaTimes />
+                                </button>
+                            </div>
                         </li>
                     ))}
                 </ul>
             </div>
             <div>
-                <h3 className="text-lg font-bold text-text-light mb-2">Contacts</h3>
-                <ul className="space-y-2">
+                <h3 className="text-lg font-bold mb-4">Contacts</h3>
+                <ul className="space-y-4">
                     {contacts.filter(c => c.accepted).map(contact => (
-                        <li key={contact.id} className="bg-dark-purple text-text-light p-2 rounded flex justify-between items-center">
+                        <li key={contact.id} className="p-4 bg-gray-700 rounded flex justify-between items-center">
                             <span>{contact.other_party.username}</span>
-                            <span className="flex items-center">
-                                <FaCircle className={`ml-2 ${onlineStatus[contact.other_party.username] ? 'text-green-500' : 'text-gray-500'}`} />
+                            <div className="flex items-center">
+                                <FaCircle className={`ml-2 ${onlineStatus[contact.other_party.username]?.is_online ? 'text-green-500' : 'text-gray-500'}`} />
+                                {!onlineStatus[contact.other_party.username]?.is_online && (
+                                    <span className="ml-2 text-sm text-gray-400">
+                                        {formatLastSeen(onlineStatus[contact.other_party.username]?.last_seen)}
+                                    </span>
+                                )}
                                 <button
                                     onClick={() => removeContact(contact.other_party.username)}
-                                    className="bg-red-500 text-text-light px-4 py-2 rounded shadow hover:bg-red-700 ml-2"
+                                    className="p-2 ml-2 bg-red-500 hover:bg-red-600 rounded-full text-white"
                                 >
-                                    Remove
+                                    <FaTimes />
                                 </button>
-                            </span>
+                            </div>
                         </li>
                     ))}
                 </ul>

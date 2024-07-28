@@ -1,8 +1,8 @@
-// Chat.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
-import { FaCircle } from "react-icons/fa";
 import { toast } from 'react-toastify';
+import { FaCircle } from 'react-icons/fa';
+import { formatLastSeen } from "../utils/utils";
 
 const Chat = () => {
     const { messages, sendMessage, contacts, username, unreadCounts, setUnreadCounts, onlineStatus } = useWebSocket();
@@ -42,13 +42,13 @@ const Chat = () => {
     const filteredMessages = messages[selectedContact] || [];
 
     return (
-        <div className="flex flex-col h-screen">
-            <header className="bg-dark-purple p-4 text-light">
+        <div className="flex flex-col h-screen bg-gray-900 text-white">
+            <header className="bg-gray-800 p-4 shadow-lg">
                 <h1 className="text-2xl font-bold">Chat Application</h1>
             </header>
-            <div className="flex flex-1">
-                <aside className="w-1/4 bg-dark-bg p-4">
-                    <h2 className="text-lg font-bold text-light mb-4">Contacts</h2>
+            <div className="flex flex-1 overflow-hidden">
+                <aside className="w-1/4 bg-gray-800 p-4 overflow-y-auto">
+                    <h2 className="text-lg font-bold mb-4">Contacts</h2>
                     <ul className="space-y-2">
                         {contacts.filter(c => c.accepted).map(contact => (
                             <li
@@ -60,26 +60,30 @@ const Chat = () => {
                                         [contact.other_party.username]: 0
                                     }));
                                 }}
-                                className={`p-2 rounded cursor-pointer ${selectedContact === contact.other_party.username ? 'bg-purple' : 'bg-dark-bg'} text-light`}
+                                className={`p-3 rounded cursor-pointer ${selectedContact === contact.other_party.username ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 flex justify-between items-center`}
                             >
-                                {contact.other_party.username}
+                                <span>{contact.other_party.username}</span>
+                                <FaCircle className={`ml-2 ${onlineStatus[contact.other_party.username]?.is_online ? 'text-green-500' : 'text-gray-500'}`} />
+                                {!onlineStatus[contact.other_party.username]?.is_online && (
+                                    <span className="ml-2 text-sm text-gray-400">
+                                        {formatLastSeen(onlineStatus[contact.other_party.username]?.last_seen)}
+                                    </span>
+                                )}
                                 {unreadCounts[contact.other_party.username] > 0 && (
                                     <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
                                         {unreadCounts[contact.other_party.username]}
                                     </span>
                                 )}
-                                <FaCircle color={onlineStatus[contact.other_party.username] ? "green" : "gray"} className="ml-2" />
                             </li>
                         ))}
                     </ul>
                 </aside>
-
-                <main className="flex-1 flex flex-col p-4 bg-dark-bg">
-                    <div className="flex-1 overflow-auto mb-4">
-                        <h2 className="text-lg font-bold text-light mb-2">Messages</h2>
-                        <ul className="space-y-2 flex flex-col">
+                <main className="flex-1 flex flex-col p-4 bg-gray-900 overflow-y-auto">
+                    <div className="flex-1 mb-4">
+                        <h2 className="text-lg font-bold mb-2">Messages</h2>
+                        <ul className="space-y-2">
                             {filteredMessages.map((msg, index) => (
-                                <li key={index} className={`message ${msg.sender === username ? 'right' : 'left'}`}>
+                                <li key={index} className={`p-2 rounded ${msg.sender === username ? 'bg-blue-600 self-end' : 'bg-gray-700 self-start'}`}>
                                     <strong>{msg.sender === username ? "You" : msg.sender}: </strong>{msg.message}
                                 </li>
                             ))}
@@ -93,13 +97,12 @@ const Chat = () => {
                             onChange={e => setMessage(e.target.value)}
                             placeholder="Type a message..."
                             onKeyPress={handleKeyPress}
-                            className="flex-1 p-2 rounded-l-md border-gray-300 bg-dark-bg text-light"
-                            autoFocus
+                            className="flex-1 p-2 rounded-l-md border-gray-600 bg-gray-700 text-white"
                         />
                         <button
                             type="button"
                             onClick={handleSendMessage}
-                            className="bg-purple text-light px-4 py-2 rounded-r-md"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700"
                         >
                             Send
                         </button>
